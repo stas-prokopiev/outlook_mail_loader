@@ -1,0 +1,4 @@
+
+class OutlookMailLoaderError(Exception):
+    """"""
+    pass

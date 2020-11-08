@@ -2,7 +2,6 @@
 # Standard library imports
 import os
 import logging
-from time import sleep
 import datetime
 from collections import OrderedDict
 import json
@@ -36,7 +35,7 @@ class OutlookLMessageSaver(object):
             msg_handler (outlook msg handler): win32com object for letter
         """
         self.msg_handler = msg_handler
-        str_received_time =str(self.msg_handler.ReceivedTime)
+        str_received_time = str(self.msg_handler.ReceivedTime)
         self.datetime_received = dateutil.parser.parse(str_received_time)
 
     def save_message(
@@ -84,17 +83,17 @@ class OutlookLMessageSaver(object):
         dict_metainfo = self._create_dict_with_metainfo()
         str_path_to_metainfo = os.path.join(
             str_path_dir_where_to_save, "dict_metainfo.json")
-        with open(str_path_to_metainfo, 'w', encoding='utf-8') as f:
+        with open(str_path_to_metainfo, 'w', encoding='utf-8') as file_handler:
             json.dump(
                 dict_metainfo,
-                f,
+                file_handler,
                 ensure_ascii=False,
                 indent=4
             )
         str_path_letter_text = os.path.join(
             str_path_dir_where_to_save, "letter.txt")
-        with open(str_path_letter_text, "w") as f:
-            f.write(dict_metainfo["Body"])
+        with open(str_path_letter_text, "w") as file_handler:
+            file_handler.write(dict_metainfo["Body"])
 
     def _create_dict_with_metainfo(self):
         """Create dict with letter metainfo from outlook message handler obj
@@ -132,6 +131,7 @@ class OutlookLMessageSaver(object):
         str_path_dir_attachments = os.path.join(
             str_path_dir_where_to_save, "ATTACHMENTS")
         os.makedirs(str_path_dir_attachments)
+        int_num = 0
         for int_num, attachment_obj in enumerate(attachments_obj):
             str_path_for_new_attachment = \
                 os.path.join(str_path_dir_attachments, attachment_obj.filename)

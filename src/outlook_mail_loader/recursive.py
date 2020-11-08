@@ -42,7 +42,8 @@ def print_hierarchy(parent_outlook_handler, int_depth_level=1):
         parent_outlook_handler (outlook folder obj): Folder where to search for
         int_depth_level (int, optional): Depth to print
     """
-    LOGGER.info("--" * int_depth_level + "> %s", parent_outlook_handler.Name)
+    str_line = "--" * int_depth_level + "> %s"
+    LOGGER.info(str_line, parent_outlook_handler.Name)
     for child_outlook_handler in parent_outlook_handler.Folders:
         print_hierarchy(
             child_outlook_handler, int_depth_level=int_depth_level+1)

@@ -7,25 +7,17 @@ import logging
 import datetime
 
 # Third party imports
-import win32com.client
 from char import char
-from local_simple_database import LocalSimpleDatabase
 
 # Local imports
 from .class_mail_dumper import MailFolderDumper
 
 LOGGER = logging.getLogger("outlook_mail_loader")
 
-
-class MailFolderListener(MailFolderDumper):
-    """"""
-    @char
-    def __init__(
-            self,
-            str_folder_to_get="root",
-            str_path_dir_where_to_save="mails",
-    ):
-        pass
-
-    # self.l_datetimes_when_letter_saved = []
-    #     self.l_datetimes_when_letter_saved.append(datetime.datetime.now())
+@char
+def listen_outlook_mail_folder():
+    """Class to dump some outlook folder with some periodic"""
+    mail_loader_obj = MailFolderDumper()
+    list_datetimes_when_letter_saved = []
+    list_datetimes_when_letter_saved.append(datetime.datetime.now())
+    return mail_loader_obj

@@ -1,5 +1,7 @@
 # My
 jupyter/*
+make.bat
+Makefile
 
 # Temporary and binary files
 *~

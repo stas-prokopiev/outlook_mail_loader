@@ -5,7 +5,6 @@ to dump outlook mail to local folder
 # Standard library imports
 import os
 import logging
-import datetime
 
 # Third party imports
 import win32com.client

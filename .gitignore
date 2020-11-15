@@ -2,6 +2,7 @@
 jupyter/*
 make.bat
 Makefile
+tests/test_mails/*
 
 # Temporary and binary files
 *~

@@ -41,7 +41,7 @@ class MailFolderDumper(object):
     @char
     def __init__(
             self,
-            str_folder_to_get="root",
+            str_folder_to_get="inbox",
             str_path_dir_where_to_save="mails",
     ):
         """Init object
@@ -50,11 +50,17 @@ class MailFolderDumper(object):
             str_folder_to_get (str, optional): Folder name to get
             str_path_dir_where_to_save (str, optional): Path where to save
         """
+        self.str_folder_to_get = str_folder_to_get
         self._outlook_obj = win32com.client.Dispatch("Outlook.Application")\
             .GetNamespace("MAPI")
         self._outlook_root_folder_handler = self._outlook_obj.Folders.Item(1)
-        self._outlook_folder_handler = self._get_folder_outlook_handler()
-        self.str_folder_to_get = str_folder_to_get
+        if self.str_folder_to_get == "root":
+            self._outlook_folder_handler = \
+                self._outlook_root_folder_handler.Folders(1)
+        elif self.str_folder_to_get == "inbox":
+            self._outlook_folder_handler = self._outlook_obj.GetDefaultFolder(6)
+        else:
+            self._outlook_folder_handler = self._get_folder_outlook_handler()
 
         # As folder handler initialized then create folder where to save mails
         self.str_path_dir_where_to_save = os.path.abspath(
@@ -163,8 +169,8 @@ class MailFolderDumper(object):
         list_last_messages = []
         messages = self._outlook_folder_handler.Items
         messages.Sort("[ReceivedTime]", True)
-        for int_mes_num, outlook_message_obj in enumerate(messages):
-            if int_mes_num >= int_max_mails_to_get:
+        for outlook_message_obj in messages:
+            if len(list_last_messages) >= int_max_mails_to_get:
                 LOGGER.info(
                     "For folder: %s Got max number of emails: %d",
                     self.str_folder_to_get,

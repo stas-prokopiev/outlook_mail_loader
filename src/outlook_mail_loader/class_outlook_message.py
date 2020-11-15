@@ -92,7 +92,7 @@ class OutlookLMessageSaver(object):
             )
         str_path_letter_text = os.path.join(
             str_path_dir_where_to_save, "letter.txt")
-        with open(str_path_letter_text, "w") as file_handler:
+        with open(str_path_letter_text, "w", encoding='utf-8') as file_handler:
             file_handler.write(dict_metainfo["Body"])
 
     def _create_dict_with_metainfo(self):
@@ -126,8 +126,6 @@ class OutlookLMessageSaver(object):
         """
         LOGGER.debug("Save attachments for letter")
         attachments_obj = self.msg_handler.Attachments
-        if not attachments_obj.Count:
-            return 0
         str_path_dir_attachments = os.path.join(
             str_path_dir_where_to_save, "ATTACHMENTS")
         os.makedirs(str_path_dir_attachments)
@@ -136,7 +134,7 @@ class OutlookLMessageSaver(object):
             str_path_for_new_attachment = \
                 os.path.join(str_path_dir_attachments, attachment_obj.filename)
             attachment_obj.SaveAsFile(str_path_for_new_attachment)
-        LOGGER.info("---> Attachments saved: %d", int_num + 1)
+        LOGGER.debug("---> Attachments saved: %d", int_num + 1)
         return int_num
 
     def _mark_as_read(self):

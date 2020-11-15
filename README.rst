@@ -30,7 +30,7 @@ outlook_mail_loader
 
 Short Overview.
 =========================
-outlook_mail_loader is a python package (**py>=2.7 or py>=3.4**) which helps in handling outlook letters
+outlook_mail_loader is a python package (**py>=3.6**) which helps in handling outlook letters
 
 This library helps to dump letters from outlook to some local folder in human readable format.
 
@@ -51,7 +51,10 @@ Dump letters from outlook to local directory
 
     from outlook_mail_loader import MailFolderDumper
 
-    mail_loader_obj = MailFolderDumper("<Name of folder to load>")
+    mail_loader_obj = MailFolderDumper(
+        str_folder_to_get="inbox",
+        str_path_dir_where_to_save="mails",
+    )
 
     mail_loader_obj.dump_new(<int_max_last_letters_to_dump>)
 

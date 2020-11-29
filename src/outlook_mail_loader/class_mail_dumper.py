@@ -96,8 +96,8 @@ class MailFolderDumper(object):
         Returns:
             int: Number of letters saved
         """
-        list_last_messages = list(
-            self._get_list_last_not_saved_messages(int_max_last_letters_to_dump))
+        list_last_messages = list(self._get_list_last_not_saved_messages(
+            int_max_last_letters_to_dump))
         for message_obj in list_last_messages:
             # Create path where to save new LETTER
             str_new_mail_dir = os.path.join(

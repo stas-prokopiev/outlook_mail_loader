@@ -13,26 +13,27 @@ from char import char
 from tqdm import tqdm
 try:
     from IPython.display import clear_output
-    bool_jupyter_installed = True
+    BOOL_JUPYTER_INSTALLED = True
 except ImportError:
-    bool_jupyter_installed = False
+    BOOL_JUPYTER_INSTALLED = False
 
 # Local imports
 from .class_mail_dumper import MailFolderDumper
+from .other import is_outlook_running, start_outlook_app
 
 LOGGER = logging.getLogger("outlook_mail_loader")
 
 @char
 def listen_outlook_mail_folder(
-        str_folder_to_get="inbox",
+        str_outlook_folder_name="inbox",
         str_path_dir_where_to_save="mails",
         int_seconds_step_in_dump=60,
         **kwargs
 ):
-    """Listen to outlook folder and dump all new mails into the local folder
+    """Listen to the outlook folder and dump all new mails continuously
 
     Args:
-        str_folder_to_get (str, optional): which outlook folder to listen
+        str_outlook_folder_name (str, optional): Which outlook folder to listen
         str_path_dir_where_to_save (str, optional): \
             Path to dir. where to save letters.
         int_seconds_step_in_dump (int, optional): \
@@ -44,39 +45,48 @@ def listen_outlook_mail_folder(
         is_to_preserve_msg_obj (bool, optional): \
             Flag if to preserve outlook .msg object. Default is False.
 
-    Returns:
-        [type]: [description]
     """
-
-    """Class to dump some outlook folder with some periodic"""
     list_datetimes_when_letter_saved = []
-    mail_loader_obj = MailFolderDumper()
     mail_loader_obj = MailFolderDumper(
-        str_folder_to_get, str_path_dir_where_to_save)
+        str_outlook_folder_name, str_path_dir_where_to_save)
     #####
     # Make first dump of the last mails
-    int_msgs_saved = mail_loader_obj.dump_new(20, **kwargs)
+    int_msgs_saved = mail_loader_obj.dump_new(50, **kwargs)
     list_datetimes_when_letter_saved += \
         [datetime.datetime.now()] * int_msgs_saved
     print_stats_about_dumped_mails(list_datetimes_when_letter_saved)
     #####
     # Create endless cycle of listening
     while True:
+        # Wait till next cycle
         for _ in tqdm(range(int_seconds_step_in_dump), leave=False):
             sleep(1)
+        #####
+        # Check that outlook is running
+        if not is_outlook_running():
+            start_outlook_app()
+            # If new outlook app is open then reinitialize MailDumper obj
+            mail_loader_obj = MailFolderDumper(
+                str_outlook_folder_name, str_path_dir_where_to_save)
+        #####
         int_msgs_saved = mail_loader_obj.dump_new(999, **kwargs)
         list_datetimes_when_letter_saved += \
             [datetime.datetime.now()] * int_msgs_saved
         print_stats_about_dumped_mails(list_datetimes_when_letter_saved)
-    return mail_loader_obj
+    LOGGER.info("FINISHED!")
 
 
 @char
 def print_stats_about_dumped_mails(list_datetimes_when_letter_saved):
-    """Print statistic about when letters were saved"""
-    if bool_jupyter_installed:
+    """Print statistic about when letters were saved
+
+    Args:
+        list_datetimes_when_letter_saved (list): list with datetimes
+    """
+    if BOOL_JUPYTER_INSTALLED:
         clear_output(wait=True)
-    LOGGER.info("=" * 79)
+    else:
+        LOGGER.info("=" * 79)
     LOGGER.info("Print statistic about saved letters:")
     if not list_datetimes_when_letter_saved:
         LOGGER.info("---> Not even 1 new letter has been received yet.")
@@ -85,7 +95,7 @@ def print_stats_about_dumped_mails(list_datetimes_when_letter_saved):
     # Get sorted list with number of seconds gone since msg saved
     dt_now = datetime.datetime.now()
     list_seconds_gone_since_saved = [
-        int((dt_now - dt_msg_saved).total_seconds())
+        int((dt_now - dt_msg_saved.replace(tzinfo=None)).total_seconds())
         for dt_msg_saved in list_datetimes_when_letter_saved]
     list_seconds_gone_since_saved.sort()
     LOGGER.info(

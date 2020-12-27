@@ -18,7 +18,7 @@ LOCAL_TIMEZONE = datetime.datetime.now(
 
 
 class OutlookLMessageSaver(object):
-    """[summary]
+    """Class to handle outlook message operations
 
     Data:
         self.msg_handler (win32com object for letter): letter handler

@@ -9,7 +9,6 @@ from char import char
 
 LOGGER = logging.getLogger("outlook_mail_loader")
 
-
 @char
 def look_for_asked_mail_folders(
         parent_outlook_handler,

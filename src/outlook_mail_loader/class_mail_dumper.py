@@ -15,6 +15,7 @@ from local_simple_database import LocalSimpleDatabase
 from .exceptions import OutlookMailLoaderError
 from .class_outlook_message import OutlookLMessageSaver
 from . import recursive
+from .other import is_outlook_running, start_outlook_app
 
 LOGGER = logging.getLogger("outlook_mail_loader")
 
@@ -22,8 +23,8 @@ LOGGER = logging.getLogger("outlook_mail_loader")
 class MailFolderDumper(object):
     """Object which handles all outlook mail dump to local folder
 
-    Data:
-        self.str_folder_to_get (str): Folder name which to dump
+    Attributes:
+        self.str_outlook_folder_name (str): Folder name which to dump
         self.str_path_dir_where_to_save (str): Path where to dump
 
     Methods:
@@ -41,30 +42,33 @@ class MailFolderDumper(object):
     @char
     def __init__(
             self,
-            str_folder_to_get="inbox",
+            str_outlook_folder_name="inbox",
             str_path_dir_where_to_save="mails",
     ):
         """Init object
 
         Args:
-            str_folder_to_get (str, optional): Folder name to get
+            str_outlook_folder_name (str, optional): Folder name to get
             str_path_dir_where_to_save (str, optional): Path where to save
         """
-        self.str_folder_to_get = str_folder_to_get
+        self.str_outlook_folder_name = str_outlook_folder_name
+        if not is_outlook_running():
+            start_outlook_app()
         self._outlook_obj = win32com.client.Dispatch("Outlook.Application")\
             .GetNamespace("MAPI")
         self._outlook_root_folder_handler = self._outlook_obj.Folders.Item(1)
-        if self.str_folder_to_get == "root":
+        if self.str_outlook_folder_name == "root":
             self._outlook_folder_handler = \
                 self._outlook_root_folder_handler.Folders(1)
-        elif self.str_folder_to_get == "inbox":
-            self._outlook_folder_handler = self._outlook_obj.GetDefaultFolder(6)
+        elif self.str_outlook_folder_name == "inbox":
+            self._outlook_folder_handler = \
+                self._outlook_obj.GetDefaultFolder(6)
         else:
             self._outlook_folder_handler = self._get_folder_outlook_handler()
 
         # As folder handler initialized then create folder where to save mails
         self.str_path_dir_where_to_save = os.path.abspath(
-            os.path.join(str_path_dir_where_to_save, str_folder_to_get))
+            os.path.join(str_path_dir_where_to_save, str_outlook_folder_name))
         if not os.path.isdir(self.str_path_dir_where_to_save):
             os.makedirs(self.str_path_dir_where_to_save)
             LOGGER.debug(
@@ -96,6 +100,13 @@ class MailFolderDumper(object):
         Returns:
             int: Number of letters saved
         """
+        # Check that outlook is running
+        if not is_outlook_running():
+            start_outlook_app()
+            # reinitialize the object to have the right handlers
+            self.__init__(
+                self.str_outlook_folder_name, self.str_path_dir_where_to_save)
+        # Get last not saved messages
         list_last_messages = list(self._get_list_last_not_saved_messages(
             int_max_last_letters_to_dump))
         for message_obj in list_last_messages:
@@ -141,16 +152,16 @@ class MailFolderDumper(object):
         """
         outlook_folder_handler = recursive.look_for_asked_mail_folders(
             self._outlook_root_folder_handler,
-            self.str_folder_to_get,
+            self.str_outlook_folder_name,
         )
         if outlook_folder_handler:
             return outlook_folder_handler
         LOGGER.warning(
             "Unable to find outlook folder with name: %s",
-            self.str_folder_to_get
+            self.str_outlook_folder_name
         )
         raise OutlookMailLoaderError(
-            "Unable to find outlook folder: %s" % self.str_folder_to_get)
+            "Unable to find outlook folder: %s" % self.str_outlook_folder_name)
 
     def _get_list_last_not_saved_messages(self, int_max_mails_to_get=10):
         """Get last not saved messages in the order oldest -> newest
@@ -164,7 +175,7 @@ class MailFolderDumper(object):
         LOGGER.debug(
             "Get last %d unsaved letters for folder: %s",
             int_max_mails_to_get,
-            self.str_folder_to_get
+            self.str_outlook_folder_name
         )
         list_last_messages = []
         messages = self._outlook_folder_handler.Items
@@ -173,7 +184,7 @@ class MailFolderDumper(object):
             if len(list_last_messages) >= int_max_mails_to_get:
                 LOGGER.info(
                     "For folder: %s Got max number of emails: %d",
-                    self.str_folder_to_get,
+                    self.str_outlook_folder_name,
                     int_max_mails_to_get,
                 )
                 break

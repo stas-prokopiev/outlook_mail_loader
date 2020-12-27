@@ -1,6 +1,7 @@
 ===================
 outlook_mail_loader
 ===================
+
 Contents
 ========
 
@@ -16,5 +17,3 @@ Contents
    Authors <authors>
    Changelog <changelog>
    Module Reference <api/modules>
-
-

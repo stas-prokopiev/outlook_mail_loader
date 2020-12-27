@@ -14,9 +14,6 @@ outlook_mail_loader
     :target: https://outlook_mail_loader.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. image:: https://travis-ci.org/stas-prokopiev/outlook_mail_loader.svg?branch=master
-    :target: https://travis-ci.org/stas-prokopiev/outlook_mail_loader
-
 .. image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
    :target: https://github.com/pre-commit/pre-commit
    :alt: pre-commit

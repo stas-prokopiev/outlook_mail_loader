@@ -177,8 +177,6 @@ class DumpedMails(object):
         str_path_letter = os.path.join(str_path_to_letter_dir, "letter.txt")
         str_path_metainfo = os.path.join(
             str_path_to_letter_dir, "dict_metainfo.json")
-        str_path_dir_attachments = os.path.join(
-            str_path_to_letter_dir, "ATTACHMENTS")
         #####
         # Check that mandatory files exists
         if not os.path.exists(str_path_letter):
@@ -193,12 +191,14 @@ class DumpedMails(object):
             dict_one_letter["dict_metainfo"] = json.load(file_handler)
         #####
         # Load attachments
+        str_path_dir_attachments = os.path.join(
+            str_path_to_letter_dir, "ATTACHMENTS")
         list_attachments = []
         if os.path.exists(str_path_dir_attachments):
-            list_attachments = [
-                os.path.abspath(str_file)
-                for str_file in os.listdir(str_path_dir_attachments)
-                if os.path.isfile(str_file)
-            ]
+            for str_filename in os.listdir(str_path_dir_attachments):
+                str_file_path = os.path.abspath(
+                    os.path.join(str_path_dir_attachments, str_filename))
+                if os.path.isfile(str_file_path):
+                    list_attachments.append(str_file_path)
         dict_one_letter["list_attachments"] = list_attachments
         return dict_one_letter

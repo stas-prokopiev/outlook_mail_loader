@@ -33,6 +33,8 @@ class MailFolderDumper(object):
             Print hierarchy for initialized outlook mail folder
         self.print_full_folders_hierarchy_from_root(...):\
             Print full hierarchy from root outlook mail folder
+        self.get_list_names_of_all_outlook_folders(...):\
+            Get list names of all outlook folders available
 
     Raises:
         OutlookMailLoaderError: Main Exception of this python package
@@ -64,7 +66,7 @@ class MailFolderDumper(object):
             self._outlook_folder_handler = \
                 self._outlook_obj.GetDefaultFolder(6)
         else:
-            self._outlook_folder_handler = self._get_folder_outlook_handler()
+            self._outlook_folder_handler = self._get_outlook_folder_handler()
 
         # As folder handler initialized then create folder where to save mails
         self.str_path_dir_where_to_save = os.path.abspath(
@@ -144,7 +146,12 @@ class MailFolderDumper(object):
         recursive.print_hierarchy(
             self._outlook_root_folder_handler, int_depth_level=1)
 
-    def _get_folder_outlook_handler(self):
+    def get_list_names_of_all_outlook_folders(self):
+        """Get list names of all outlook folders available"""
+        return recursive.get_list_names_of_all_outlook_folders(
+            self._outlook_root_folder_handler)
+
+    def _get_outlook_folder_handler(self):
         """Get outlook folder handler for folder with asked name
 
         Raises:
@@ -160,6 +167,11 @@ class MailFolderDumper(object):
             "Unable to find outlook folder with name: %s",
             self.str_outlook_folder_name
         )
+
+        LOGGER.warning("All available folders are:")
+        list_names_of_folders = self.get_list_names_of_all_outlook_folders()
+        for int_num, str_outlook_folder in enumerate(list_names_of_folders):
+            LOGGER.warning("--> %d) %s", int_num, str_outlook_folder)
         raise OutlookMailLoaderError(
             "Unable to find outlook folder: %s" % self.str_outlook_folder_name)
 

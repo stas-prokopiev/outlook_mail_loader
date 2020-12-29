@@ -46,3 +46,12 @@ def print_hierarchy(parent_outlook_handler, int_depth_level=1):
     for child_outlook_handler in parent_outlook_handler.Folders:
         print_hierarchy(
             child_outlook_handler, int_depth_level=int_depth_level+1)
+
+def get_list_names_of_all_outlook_folders(parent_outlook_handler):
+    """Get list names of all outlook folders starting from the asked one"""
+    list_names_of_all_outlook_folders = []
+    list_names_of_all_outlook_folders.append(parent_outlook_handler.Name)
+    for child_outlook_handler in parent_outlook_handler.Folders:
+        list_names_of_all_outlook_folders += \
+            get_list_names_of_all_outlook_folders(child_outlook_handler)
+    return list_names_of_all_outlook_folders

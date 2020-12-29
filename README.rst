@@ -107,6 +107,7 @@ Methods:
 * **.dump_new(...)** - Dump new letters to set local directory
 * **.print_stats_about_initialized_folders()** - Print hierarchy for initialized outlook mail folder
 * **.print_full_folders_hierarchy_from_root()** - Print full hierarchy from root outlook mail folder
+* **.get_list_names_of_all_outlook_folders()** - Get list names of all outlook folders available
 
 2) Process dumped letters
 ---------------------------------------------

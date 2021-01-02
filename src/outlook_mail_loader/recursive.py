@@ -25,7 +25,7 @@ def look_for_asked_mail_folders(
     """
     str_folder_name = parent_outlook_handler.Name
     if str_folder_name == str_folder_name_to_get:
-        return parent_outlook_handler
+        return parent_outlook_handler, str_folder_name
 
     for child_outlook_handler in parent_outlook_handler.Folders:
         res, str_folder_path = look_for_asked_mail_folders(

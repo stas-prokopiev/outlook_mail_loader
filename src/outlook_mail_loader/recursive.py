@@ -23,16 +23,18 @@ def look_for_asked_mail_folders(
     Returns:
         (outlook folder obj): outlook handler object for given folder
     """
-    if parent_outlook_handler.Name == str_folder_name_to_get:
+    str_folder_name = parent_outlook_handler.Name
+    if str_folder_name == str_folder_name_to_get:
         return parent_outlook_handler
+
     for child_outlook_handler in parent_outlook_handler.Folders:
-        res = look_for_asked_mail_folders(
+        res, str_folder_path = look_for_asked_mail_folders(
             child_outlook_handler,
             str_folder_name_to_get,
         )
         if res is not None:
-            return res
-    return None
+            return res, str_folder_name + " / " + str_folder_path
+    return None, ""
 
 
 @char

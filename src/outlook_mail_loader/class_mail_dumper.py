@@ -59,14 +59,19 @@ class MailFolderDumper(object):
         self._outlook_obj = win32com.client.Dispatch("Outlook.Application")\
             .GetNamespace("MAPI")
         self._outlook_root_folder_handler = self._outlook_obj.Folders.Item(1)
-        if self.str_outlook_folder_name == "root":
-            self._outlook_folder_handler = \
-                self._outlook_root_folder_handler.Folders(1)
-        elif self.str_outlook_folder_name == "inbox":
+        self._outlook_inbox_folder_handler = \
+            self._outlook_obj.GetDefaultFolder(6)
+
+
+        # if self.str_outlook_folder_name == "root":
+        #     self._outlook_folder_handler = \
+        #         self._outlook_root_folder_handler.Folders(1)
+        if self.str_outlook_folder_name == "inbox":
             self._outlook_folder_handler = \
                 self._outlook_obj.GetDefaultFolder(6)
         else:
-            self._outlook_folder_handler = self._get_outlook_folder_handler()
+            self._outlook_folder_handler, self._str_folder_path = \
+                self._get_outlook_folder_handler()
 
         # As folder handler initialized then create folder where to save mails
         self.str_path_dir_where_to_save = os.path.abspath(
@@ -80,6 +85,12 @@ class MailFolderDumper(object):
         self._local_database = \
             LocalSimpleDatabase(self.str_path_dir_where_to_save)
         logging.info("Mail loader object initialized")
+
+
+    def __repr__(self):
+        """Representation of current object"""
+        return "Path of initialized outlook folder: %s" % self._str_folder_path
+
 
     def dump_new(
             self,
@@ -136,9 +147,13 @@ class MailFolderDumper(object):
     def print_stats_about_initialized_folders(self):
         """Print hierarchy for initialized outlook mail folder
         """
-        LOGGER.info("Statistics about initialized dirs.")
-        recursive.print_hierarchy(
-            self._outlook_folder_handler, int_depth_level=1)
+        LOGGER.info("Statistics about initialized dir.")
+        LOGGER.info(
+            "Path of initialized outlook folder: %s", self._str_folder_path)
+
+        # LOGGER.info("H")
+        # recursive.print_hierarchy(
+        #     self._outlook_folder_handler, int_depth_level=1)
 
     def print_full_folders_hierarchy_from_root(self):
         """Print full hierarchy from root outlook mail folder
@@ -157,12 +172,24 @@ class MailFolderDumper(object):
         Raises:
             OutlookMailLoaderError:  Main Exception of this python package
         """
-        outlook_folder_handler = recursive.look_for_asked_mail_folders(
-            self._outlook_root_folder_handler,
-            self.str_outlook_folder_name,
-        )
+        # First search inside inbox folder
+        outlook_folder_handler, str_folder_path = \
+            recursive.look_for_asked_mail_folders(
+                self._outlook_inbox_folder_handler,
+                self.str_outlook_folder_name
+            )
         if outlook_folder_handler:
-            return outlook_folder_handler
+            return outlook_folder_handler, str_folder_path
+        #####
+        # Then search in every available folder  including archive
+        outlook_folder_handler, str_folder_path = \
+            recursive.look_for_asked_mail_folders(
+                self._outlook_root_folder_handler,
+                self.str_outlook_folder_name,
+            )
+        if outlook_folder_handler:
+            return outlook_folder_handler, str_folder_path
+        #####
         LOGGER.warning(
             "Unable to find outlook folder with name: %s",
             self.str_outlook_folder_name

@@ -61,8 +61,6 @@ class MailFolderDumper(object):
         self._outlook_root_folder_handler = self._outlook_obj.Folders.Item(1)
         self._outlook_inbox_folder_handler = \
             self._outlook_obj.GetDefaultFolder(6)
-
-
         # if self.str_outlook_folder_name == "root":
         #     self._outlook_folder_handler = \
         #         self._outlook_root_folder_handler.Folders(1)
@@ -86,11 +84,16 @@ class MailFolderDumper(object):
             LocalSimpleDatabase(self.str_path_dir_where_to_save)
         logging.info("Mail loader object initialized")
 
-
     def __repr__(self):
         """Representation of current object"""
-        return "Path of initialized outlook folder: %s" % self._str_folder_path
-
+        str_repr = "Outlook folder dumper\n"
+        str_repr += "--> Folder Path: %s\n" % self._str_folder_path
+        str_repr += "--> Number of max dumped letter: {}\n".format(
+            self._local_database["int_last_letter_num"])
+        dt = self._local_database["datetime_last_letter_receive_time"]
+        str_repr += "--> Time when Last letter received: {}\n".format(
+            dt.strftime("%A, %d. %B %Y %I:%M%p"))
+        return str_repr
 
     def dump_new(
             self,
@@ -150,10 +153,8 @@ class MailFolderDumper(object):
         LOGGER.info("Statistics about initialized dir.")
         LOGGER.info(
             "Path of initialized outlook folder: %s", self._str_folder_path)
-
-        # LOGGER.info("H")
-        # recursive.print_hierarchy(
-        #     self._outlook_folder_handler, int_depth_level=1)
+        recursive.print_hierarchy(
+            self._outlook_folder_handler, int_depth_level=1)
 
     def print_full_folders_hierarchy_from_root(self):
         """Print full hierarchy from root outlook mail folder
